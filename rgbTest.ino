@@ -1,5 +1,8 @@
 /*
  * Note: This code requires the Adafruit Neopixel library
+ * Note: Associated with a tinkercad file https://www.tinkercad.com/things/geZed6catwZ?sharecode=e85x4xt01RLKJn0-JfepLQIl7uWGnyHJw1_Cbc8NIvM
+ * 
+ * This is the code for a digital prototype for the shelf system
  */
 
 #include <Adafruit_NeoPixel.h>
