@@ -1,0 +1,12 @@
+const int outputPin = 13;  // Define the digital pin to which you want to send the square wave
+
+void setup() {
+  pinMode(outputPin, OUTPUT);  // Set the outputPin as an OUTPUT
+}
+
+void loop() {
+  digitalWrite(outputPin, HIGH);  // Set the outputPin to HIGH (5V)
+  delay(1000);  // Delay for 1000 milliseconds (1 second)
+  digitalWrite(outputPin, LOW);  // Set the outputPin to LOW (0V)
+  delay(1000);  // Delay for 1000 milliseconds (1 second)
+}
