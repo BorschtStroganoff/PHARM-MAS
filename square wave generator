@@ -1,51 +1,47 @@
-const int outputPin = 9; // Digital pin where you want to generate the square wave
-int dutyCycle = 50;     // Initial duty cycle (in percentage)
+/*
+ * This file was used in testing a solenoid. 
+ */
+
+#define DRAWER_PIN 9
+
+// Function to open the lid of the box. Argument is the servo we wish to move.
+void open_drawer(int drawer_pin);
+
+int x;
 
 void setup() {
-  pinMode(outputPin, OUTPUT);
-  // Set up a Timer1 interrupt to generate the square wave
-  TCCR1A = 0; // Set TCCR1A register to default
-  TCCR1B = 0; // Set TCCR1B register to default
-  TCNT1 = 0;  // Initialize the counter to 0
-  OCR1A = 100; // Set the compare value to control the frequency
-  TCCR1A |= (1 << COM1A0); // Toggle OC1A on compare match
-  TCCR1B |= (1 << WGM12);  // Set the CTC mode
-  TCCR1B |= (1 << CS10);   // Set prescaler to 1 (no prescaling)
-  // Enable the Timer1 overflow interrupt
-  TIMSK1 |= (1 << OCIE1A);
-  // Serial.begin(9600);
+  pinMode(DRAWER_PIN, OUTPUT);
+  Serial.begin(9600);
 }
+
 
 void loop() {
-  // You can customize the duty cycle by changing the dutyCycle variable (0 to 100)
-  if (dutyCycle < 0) dutyCycle = 0;
-  if (dutyCycle > 100) dutyCycle = 100;
-  OCR1B = map(dutyCycle, 0, 100, 0, 100);
-  // Print the duty cycle value (for debugging)
-  // Serial.println(dutyCycle);
-  delay(1000); // Delay for 1 second (adjust as needed)
+//  while(Serial.available() ==0){
+//    delay(10);
+//  }
+//
+//  x = Serial.readString().toInt();
+//
+//  if (x == 1) {
+//    open_drawer(DRAWER_PIN);
+//  }
+
+  open_drawer(DRAWER_PIN);
+//  delay(2000);
 }
 
-// Timer1 compare match ISR
-ISR(TIMER1_COMPA_vect) {
-  digitalWrite(outputPin, HIGH);
+void open_drawer(int drawer_pin)
+{
+  digitalWrite(drawer_pin, HIGH);
+  delay(200);
+  digitalWrite(drawer_pin,LOW);
+  delay(800);
 }
 
-// Timer1 overflow ISR
-ISR(TIMER1_OVF_vect) {
-  digitalWrite(outputPin, LOW);
-}
-In this code:
-
-We use Timer1 to generate the square wave.
-The dutyCycle variable allows you to set the duty cycle as a percentage (0-100%).
-The timer is set to toggle the output pin on compare match (i.e., when TCNT1 equals OCR1A).
-You can change the duty cycle by modifying the dutyCycle variable.
-The duty cycle is adjusted once every second in the loop() function.
-Keep in mind that using timers and interrupts can be more complex than simple delay-based approaches, and the actual frequency precision depends on the Arduino board's clock frequency. Additionally, not all Arduino pins support Timer1 output, so you may need to select a compatible pin.
-
-
-
-
-
-
+//void square_wave(int outputPin)
+//{
+//  digitalWrite(outputPin, HIGH);  // Set the outputPin to HIGH (5V)
+//  delay(1000);  // Delay for 1000 milliseconds (1 second)
+//  digitalWrite(outputPin, LOW);  // Set the outputPin to LOW (0V)
+//  delay(1000);  // Delay for 1000 milliseconds (1 second)
+//}
