@@ -37,9 +37,10 @@ void turnOnStrip() {
 }
 
 void turnOffStrip() {
-  for (int i = 0; i < NUMPIXELS; i++) {
-    strip.setPixelColor(i, 0, 0, 0); // Set color to off
-  }
+  // for (int i = 0; i < NUMPIXELS; i++) {
+  //   strip.setPixelColor(i, 0, 0, 0); // Set color to off
+  // }
+  strip.clear();
   strip.show();
   delay(10);
 }
