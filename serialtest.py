@@ -1,21 +1,25 @@
-# This program was used in testing the servo motors to be used in the EPICS PHARM MAS project.
-# It uses a serial connection to the arduino via the PySerial library.
-# To use this program, you have to install the PySerial libary (https://pypi.org/project/pyserial/)
-# Essentially, you have to type "pip install pyserial" into a command terminal, either from vscode's terminal or thru cmd.exe running as administrator
-
 import serial
+import serial.tools.list_ports
 import time
 
-# defines the Serial port and automatically opens the serial connection
-arduino = serial.Serial("COM9", baudrate=9600, timeout=1) # Edit the name of the com port
+# Find available serial ports
+ports = list(serial.tools.list_ports.comports())
+if not ports:
+    print("No serial ports found. Make sure your Arduino is connected.")
+    exit()
 
-# sends a signal to the arduino via serial connection (USB)
+# Use the first available port (you may want to add more logic to choose the correct port)
+arduino_port = ports[0].device
+
+# Define the Serial port and automatically open the serial connection
+arduino = serial.Serial(arduino_port, baudrate=9600, timeout=1)
+
+# Sends a signal to the Arduino via serial connection (USB)
 def command(x):
-    arduino.write(bytes(x,'utf-8'))
+    arduino.write(bytes(x, 'utf-8'))
 
-# Reads user input and sends the number to the arduino
-while(True):
+# Reads user input and sends the number to the Arduino
+while True:
     cmd = input("Type 1 to open the box. Type 0 to close the box.\n")
     command(cmd)
     time.sleep(1)
-
