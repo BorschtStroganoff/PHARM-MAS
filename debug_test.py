@@ -1,3 +1,19 @@
+# This is the code used on the raspberry pi 4b for debugging purposed. We are making sure that all the software and hardware work well in tandem
+
+# Here are the installation commands that need to be sent to bash before this can be run:
+
+# sudo apt-get update
+# sudo apt-get install python3-pip libopenblas-base libopenblas-dev
+# pip3 install torch torchvision pillow
+# sudo apt-get install fswebcam
+# sudo apt-get install python3-tk
+# pip3 install Pillow
+
+
+# Make sure that you have yolov5 installed, with the required weight file (ending in .pt) and detect.py in the same folder
+# git clone https://github.com/ultralytics/yolov5.git
+
+
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk  # Import ImageTk from PIL
