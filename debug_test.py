@@ -16,7 +16,7 @@ def light_on(serial_port='/dev/ttyACM0', baud_rate=9600):
         print("Sent '1' to Arduino")
         ser.close()
     except Exception as e:
-        print(f"Failed to send data to Arduino: {e}")
+        print(f"Failed to send data to turn on light to Arduino: {e}")
 
 def light_off(serial_port='/dev/ttyACM0', baud_rate=9600):
     try:
@@ -26,7 +26,7 @@ def light_off(serial_port='/dev/ttyACM0', baud_rate=9600):
         print("Sent '0' to Arduino")
         ser.close()
     except Exception as e:
-        print(f"Failed to send data to Arduino: {e}")
+        print(f"Failed to send data to turn off light to Arduino: {e}")
 
 def take_image(label):
     # Capture image
@@ -87,7 +87,7 @@ def open_drawer(serial_port='/dev/ttyACM0', baud_rate=9600):
         print("Sent '2' to Arduino")
         ser.close()
     except Exception as e:
-        print(f"Failed to send data to Arduino: {e}")
+        print(f"Failed to send data to open drawer to Arduino: {e}")
 
 if __name__ == "__main__":
     root = tk.Tk()
