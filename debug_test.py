@@ -31,7 +31,7 @@ def light_off(serial_port='/dev/ttyACM0', baud_rate=9600):
 
 def take_image():
     # Capture image
-    subprocess.run(["fswebcam", "-r", "1280x720", "--no-banner", "captured_image.jpg"])
+    subprocess.run(["fswebcam", "-r", "1920x1080", "--no-banner", "captured_image.jpg"])
 
     # YOLOv5 detection
     detect_script = "detect.py"
@@ -47,8 +47,8 @@ def take_image():
         "python3",
         detect_script,
         "--weights", weight_file,
-        "--img-size", "640",
-        "--conf", "0.25",
+        "--img-size", "1920x1080",
+        "--conf", "0.4",
         "--source", image_file
     ]
 
@@ -78,7 +78,7 @@ def take_image():
         for result in yolo_results:
             print(f"Class: {result['class_id']}, Confidence: {result['confidence']:.2f}, Bbox: {result['bbox']}")
     
-def open_dr(serial_port='/dev/ttyACM0', baud_rate=9600):
+def open_drawer(serial_port='/dev/ttyACM0', baud_rate=9600):
     try:
         ser = serial.Serial(serial_port, baud_rate)
         time.sleep(2) 
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     bt_take_image = tk.Button(root, text="Take and Evalutate Image", command=take_image)
     bt_take_image.pack(pady=10)
 
-    bt_open_dr = tk.Button(root, text="Open Drawer", command=open_dr)
-    bt_open_dr.pack(pady=10)
+    bt_open_drawer = tk.Button(root, text="Open Drawer", command=open_drawer)
+    bt_open_drawer.pack(pady=10)
 
     root.mainloop()
