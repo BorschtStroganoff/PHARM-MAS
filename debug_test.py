@@ -15,10 +15,8 @@
 
 
 import tkinter as tk
-from tkinter import simpledialog, messagebox
-from PIL import Image, ImageTk  # Import ImageTk from PIL
+from PIL import Image, ImageTk
 import serial
-import serial.tools.list_ports
 import time
 import subprocess
 import os
@@ -49,30 +47,38 @@ def take_image(label):
     subprocess.run(["fswebcam", "-r", "1920x1080", "--no-banner", "captured_image.jpg"])
 
     # YOLOv5 detection
-    detect_script = "detect.py"
-    weight_file = "weight.pt"
+    detect_script = "yolov5/detect.py"
+    weight_file = "pencil.pt"
     image_file = "captured_image.jpg"
+
+    detect_script = str(Path(__file__).resolve().parent / detect_script)
+    weight_file = str(Path(__file__).resolve().parent / weight_file)
+    image_file = str(Path(__file__).resolve().parent / image_file)
 
     if not (os.path.exists(detect_script) and os.path.exists(weight_file) and os.path.exists(image_file)):
         print("Error: YOLOv5 script, weight file, or image file not found.")
         return
 
-    # Run YOLOv5 detection
+    # Specify the output directory for YOLOv5 results
+    output_dir = "inference/output"
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Run YOLOv5 detection with the specified output directory
     detection_command = [
         "python3",
         detect_script,
         "--weights", weight_file,
-        "--img-size", "1920x1080",
-        "--conf", "0.4",
-        "--source", image_file
+        "--img-size", "640",
+        "--conf", "0.25",
+        "--source", image_file,
+        "--save-txt",  # Save results in the output directory
+        "--project", output_dir  # Specify the output directory
     ]
 
     subprocess.run(detection_command)
 
     # Load the result of YOLOv5 detection and display in Tkinter GUI
-    results_path = Path("inference", "output")
-    results_file = results_path / "captured_image.jpg"
-
+    results_file = Path(output_dir) / "captured_image.jpg"
     if results_file.exists():
         image_result = Image.open(results_file)
         tk_image = ImageTk.PhotoImage(image_result)
@@ -81,7 +87,7 @@ def take_image(label):
 
         # Process YOLOv5 results
         yolo_results = []
-        with open(results_path / "captured_image.txt", "r") as result_file:
+        with open(results_file.with_suffix(".txt"), "r") as result_file:
             lines = result_file.readlines()
             for line in lines:
                 class_id, confidence, x_min, y_min, x_max, y_max = map(float, line.split())
@@ -104,7 +110,7 @@ def open_drawer(serial_port='/dev/ttyACM0', baud_rate=9600):
         ser.close()
     except Exception as e:
         print(f"Failed to send data to open drawer to Arduino: {e}")
-        
+
 if __name__ == "__main__":
     root = tk.Tk()
 
