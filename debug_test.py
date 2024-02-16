@@ -42,7 +42,7 @@ def light_off(serial_port='/dev/ttyACM0', baud_rate=9600):
     except Exception as e:
         print(f"Failed to send data to turn off light to Arduino: {e}")
 
-def take_image(label):
+def take_image():
     # Capture image
     subprocess.run(["fswebcam", "-r", "1920x1080", "--no-banner", "captured_image.jpg"])
 
@@ -77,13 +77,18 @@ def take_image(label):
 
     subprocess.run(detection_command)
 
-    # Load the result of YOLOv5 detection and display in Tkinter GUI
+    # Load the result of YOLOv5 detection
     results_file = Path(output_dir) / "captured_image.jpg"
     if results_file.exists():
         image_result = Image.open(results_file)
+
+        # Display the marked image in a new window
+        result_window = tk.Toplevel(root)
+        result_window.title("YOLOv5 Result")
+
         tk_image = ImageTk.PhotoImage(image_result)
-        label.config(image=tk_image)
-        label.image = tk_image  # Keep a reference to avoid garbage collection
+        label = tk.Label(result_window, image=tk_image)
+        label.pack(pady=10)
 
         # Process YOLOv5 results
         yolo_results = []
@@ -114,10 +119,6 @@ def open_drawer(serial_port='/dev/ttyACM0', baud_rate=9600):
 if __name__ == "__main__":
     root = tk.Tk()
 
-    # Create a label to display the image
-    image_label = tk.Label(root)
-    image_label.pack(pady=10)
-
     # Set button size
     button_width = 15
     button_height = 5
@@ -128,11 +129,12 @@ if __name__ == "__main__":
     bt_light_off = tk.Button(root, text="Turn Light Off", command=lambda: light_off(), width=button_width, height=button_height)
     bt_light_off.pack(pady=10)
 
-    bt_take_image = tk.Button(root, text="Take and Evaluate Image", command=lambda: take_image(image_label), width=button_width, height=button_height)
+    bt_take_image = tk.Button(root, text="Take and Evaluate Image", command=take_image, width=button_width, height=button_height)
     bt_take_image.pack(pady=10)
 
     bt_open_drawer = tk.Button(root, text="Open Drawer", command=lambda: open_drawer(), width=button_width, height=button_height)
     bt_open_drawer.pack(pady=10)
 
     root.mainloop()
+
 
