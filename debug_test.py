@@ -113,8 +113,8 @@ if __name__ == "__main__":
     image_label.pack(pady=10)
 
     # Set button size
-    button_width = 20
-    button_height = 20
+    button_width = 15
+    button_height = 5
 
     bt_light_on = tk.Button(root, text="Turn Light On", command=lambda: light_on(), width=button_width, height=button_height)
     bt_light_on.pack(pady=10)
