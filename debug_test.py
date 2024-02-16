@@ -104,7 +104,7 @@ def open_drawer(serial_port='/dev/ttyACM0', baud_rate=9600):
         ser.close()
     except Exception as e:
         print(f"Failed to send data to open drawer to Arduino: {e}")
-
+        
 if __name__ == "__main__":
     root = tk.Tk()
 
@@ -112,16 +112,20 @@ if __name__ == "__main__":
     image_label = tk.Label(root)
     image_label.pack(pady=10)
 
-    bt_light_on = tk.Button(root, text="Turn Light On", command=lambda: light_on())
+    # Set button size
+    button_width = 20
+    button_height = 20
+
+    bt_light_on = tk.Button(root, text="Turn Light On", command=lambda: light_on(), width=button_width, height=button_height)
     bt_light_on.pack(pady=10)
 
-    bt_light_off = tk.Button(root, text="Turn Light Off", command=lambda: light_off())
+    bt_light_off = tk.Button(root, text="Turn Light Off", command=lambda: light_off(), width=button_width, height=button_height)
     bt_light_off.pack(pady=10)
 
-    bt_take_image = tk.Button(root, text="Take and Evaluate Image", command=lambda: take_image(image_label))
+    bt_take_image = tk.Button(root, text="Take and Evaluate Image", command=lambda: take_image(image_label), width=button_width, height=button_height)
     bt_take_image.pack(pady=10)
 
-    bt_open_drawer = tk.Button(root, text="Open Drawer", command=lambda: open_drawer())
+    bt_open_drawer = tk.Button(root, text="Open Drawer", command=lambda: open_drawer(), width=button_width, height=button_height)
     bt_open_drawer.pack(pady=10)
 
     root.mainloop()
