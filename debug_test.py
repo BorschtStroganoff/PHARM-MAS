@@ -23,118 +23,117 @@ import os
 from pathlib import Path
 
 def light_on(serial_port='/dev/ttyACM0', baud_rate=9600):
-    try:
-        ser = serial.Serial(serial_port, baud_rate)
-        time.sleep(2)
-        ser.write(b'1')
-        print("Sent '1' to Arduino")
-        ser.close()
-    except Exception as e:
-        print(f"Failed to send data to turn on light to Arduino: {e}")
+   try:
+       ser = serial.Serial(serial_port, baud_rate)
+       time.sleep(2)
+       ser.write(b'1')
+       print("Sent '1' to Arduino")
+       ser.close()
+   except Exception as e:
+       print(f"Failed to send data to turn on light to Arduino: {e}")
 
 def light_off(serial_port='/dev/ttyACM0', baud_rate=9600):
-    try:
-        ser = serial.Serial(serial_port, baud_rate)
-        time.sleep(2)
-        ser.write(b'0')
-        print("Sent '0' to Arduino")
-        ser.close()
-    except Exception as e:
-        print(f"Failed to send data to turn off light to Arduino: {e}")
+   try:
+       ser = serial.Serial(serial_port, baud_rate)
+       time.sleep(2)
+       ser.write(b'0')
+       print("Sent '0' to Arduino")
+       ser.close()
+   except Exception as e:
+       print(f"Failed to send data to turn off light to Arduino: {e}")
 
 def take_image():
-    # Capture image
-    subprocess.run(["fswebcam", "-r", "1920x1080", "--no-banner", "captured_image.jpg"])
+   # Capture image
+   subprocess.run(["fswebcam", "-r", "1920x1080", "--no-banner", "captured_image.jpg"])
 
-    # YOLOv5 detection
-    detect_script = "yolov5/detect.py"
-    weight_file = "pencil.pt"
-    image_file = "captured_image.jpg"
+   # YOLOv5 detection
+   detect_script = "yolov5/detect.py"
+   weight_file = "pencil.pt"
+   image_file = "captured_image.jpg"
 
-    detect_script = str(Path(__file__).resolve().parent / detect_script)
-    weight_file = str(Path(__file__).resolve().parent / weight_file)
-    image_file = str(Path(__file__).resolve().parent / image_file)
+   detect_script = str(Path(__file__).resolve().parent / detect_script)
+   weight_file = str(Path(__file__).resolve().parent / weight_file)
+   image_file = str(Path(__file__).resolve().parent / image_file)
 
-    if not (os.path.exists(detect_script) and os.path.exists(weight_file) and os.path.exists(image_file)):
-        print("Error: YOLOv5 script, weight file, or image file not found.")
-        return
+   if not (os.path.exists(detect_script) and os.path.exists(weight_file) and os.path.exists(image_file)):
+       print("Error: YOLOv5 script, weight file, or image file not found.")
+       return
 
-    # Specify the output directory for YOLOv5 results
-    output_dir = "inference/output"
-    os.makedirs(output_dir, exist_ok=True)
+   # Specify the output directory for YOLOv5 results
+   output_dir = "inference/output"
+   os.makedirs(output_dir, exist_ok=True)
 
-    # Run YOLOv5 detection with the specified output directory
-    detection_command = [
-        "python3",
-        detect_script,
-        "--weights", weight_file,
-        "--img-size", "640",
-        "--conf", "0.25",
-        "--source", image_file,
-        "--save-txt",  # Save results in the output directory
-        "--project", output_dir  # Specify the output directory
-    ]
+   # Run YOLOv5 detection with the specified output directory
+   detection_command = [
+       "python3",
+       detect_script,
+       "--weights", weight_file,
+       "--img-size", "640",
+       "--conf", "0.25",
+       "--source", image_file,
+       "--save-txt",  # Save results in the output directory
+       "--project", output_dir  # Specify the output directory
+   ]
 
-    subprocess.run(detection_command)
+   subprocess.run(detection_command)
 
-    # Load the result of YOLOv5 detection
-    results_file = Path(output_dir) / "captured_image.jpg"
-    if results_file.exists():
-        image_result = Image.open(results_file)
+   # Load the result of YOLOv5 detection
+   results_file = Path(output_dir) / "exp" / "captured_image.jpg"
+   results_info_file = Path(output_dir) / "exp" / "labels" / "captured_image.txt"
+   if results_file.exists():
+       image_result = Image.open(results_file)
 
-        # Display the marked image in a new window
-        result_window = tk.Toplevel(root)
-        result_window.title("YOLOv5 Result")
+       # Display the marked image in a new window
+       result_window = tk.Toplevel(root)
+       result_window.title("YOLOv5 Result")
 
-        tk_image = ImageTk.PhotoImage(image_result)
-        label = tk.Label(result_window, image=tk_image)
-        label.pack(pady=10)
+       tk_image = ImageTk.PhotoImage(image_result)
+       label = tk.Label(result_window, image=tk_image)
+       label.pack(pady=10)
 
-        # Process YOLOv5 results
-        yolo_results = []
-        with open(results_file.with_suffix(".txt"), "r") as result_file:
-            lines = result_file.readlines()
-            for line in lines:
-                class_id, confidence, x_min, y_min, x_max, y_max = map(float, line.split())
-                yolo_results.append({
-                    "class_id": int(class_id),
-                    "confidence": confidence,
-                    "bbox": (x_min, y_min, x_max, y_max)
-                })
+       # Process YOLOv5 results
+       yolo_results = []
+       with open(results_info_file.with_suffix(".txt"), "r") as result_file:
+           lines = result_file.readlines()
+           for line in lines:
+               class_id, confidence, x_min, y_min, x_max, y_max = map(float, line.split())
+               yolo_results.append({
+                   "class_id": int(class_id),
+                   "confidence": confidence,
+                   "bbox": (x_min, y_min, x_max, y_max)
+               })
 
-        print("YOLOv5 Detection Results:")
-        for result in yolo_results:
-            print(f"Class: {result['class_id']}, Confidence: {result['confidence']:.2f}, Bbox: {result['bbox']}")
+       print("YOLOv5 Detection Results:")
+       for result in yolo_results:
+           print(f"Class: {result['class_id']}, Confidence: {result['confidence']:.2f}, Bbox: {result['bbox']}")
 
 def open_drawer(serial_port='/dev/ttyACM0', baud_rate=9600):
-    try:
-        ser = serial.Serial(serial_port, baud_rate)
-        time.sleep(2)
-        ser.write(b'2')
-        print("Sent '2' to Arduino")
-        ser.close()
-    except Exception as e:
-        print(f"Failed to send data to open drawer to Arduino: {e}")
+   try:
+       ser = serial.Serial(serial_port, baud_rate)
+       time.sleep(2)
+       ser.write(b'2')
+       print("Sent '2' to Arduino")
+       ser.close()
+   except Exception as e:
+       print(f"Failed to send data to open drawer to Arduino: {e}")
 
 if __name__ == "__main__":
-    root = tk.Tk()
+   root = tk.Tk()
 
-    # Set button size
-    button_width = 15
-    button_height = 5
+   # Set button size
+   button_width = 15
+   button_height = 5
 
-    bt_light_on = tk.Button(root, text="Turn Light On", command=lambda: light_on(), width=button_width, height=button_height)
-    bt_light_on.pack(pady=10)
+   bt_light_on = tk.Button(root, text="Turn Light On", command=lambda: light_on(), width=button_width, height=button_height)
+   bt_light_on.pack(pady=10)
 
-    bt_light_off = tk.Button(root, text="Turn Light Off", command=lambda: light_off(), width=button_width, height=button_height)
-    bt_light_off.pack(pady=10)
+   bt_light_off = tk.Button(root, text="Turn Light Off", command=lambda: light_off(), width=button_width, height=button_height)
+   bt_light_off.pack(pady=10)
 
-    bt_take_image = tk.Button(root, text="Take and Evaluate Image", command=take_image, width=button_width, height=button_height)
-    bt_take_image.pack(pady=10)
+   bt_take_image = tk.Button(root, text="Take and Evaluate Image", command=take_image, width=button_width, height=button_height)
+   bt_take_image.pack(pady=10)
 
-    bt_open_drawer = tk.Button(root, text="Open Drawer", command=lambda: open_drawer(), width=button_width, height=button_height)
-    bt_open_drawer.pack(pady=10)
+   bt_open_drawer = tk.Button(root, text="Open Drawer", command=lambda: open_drawer(), width=button_width, height=button_height)
+   bt_open_drawer.pack(pady=10)
 
-    root.mainloop()
-
-
+   root.mainloop()
